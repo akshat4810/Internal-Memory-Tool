@@ -2,10 +2,10 @@
 This Memory Tool is a simple utility for educational purposes to demonstrate memory manipulation techniques. It provides functionalities to search, read, write, and manipulate memory contents within specified ranges. It makes use of linux based syscall for memory reading &amp; writing.
 
 ## Features
+- **Memory Range Setting**: Set the search range to different memory regions.
 - **Memory Search**: Search for specific data values within memory.
 - **Memory Offset**: Offset memory contents by a specified amount.
 - **Memory Write**: Write new data values to memory at specific offsets.
-- **Memory Range Setting**: Set the search range to different memory regions.
 
 ## Usage
 1. **Initialization**: Call `initMemTool()` to initialize the memory tool.
