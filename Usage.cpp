@@ -17,8 +17,6 @@ void memwrite() {
 
 // Main thread function
 void * main_thread(void *) {
-	initMemTool(); // Initialize the memory tool
-	sleep(3);
 	memwrite();
 	return 0;
 }
