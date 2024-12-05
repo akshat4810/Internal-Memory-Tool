@@ -33,8 +33,6 @@ int BSize = sizeof(mbyte);
 int ULSize = sizeof(ulong);
 int GAME_PID = -1;
 
-size_t page_size = 0;
-
 std::list<sAddr> *DataList = new std::list<sAddr>;
 std::list<sAddr> *MapList = new std::list<sAddr>;
 
@@ -46,11 +44,9 @@ int pr(void * buff, size_t len, long int addr, long int offset) {
     iov_ReadBuffer[0].iov_len = len;
     iov_ReadOffset[0].iov_base = (void *)(addr + offset);
     iov_ReadOffset[0].iov_len = len;
-	/*iovec iov_ReadBuffer {}, iov_ReadOffset {};
-	iov_ReadBuffer.iov_base = buff;
-	iov_ReadBuffer.iov_len = len;
-	iov_ReadOffset.iov_base = (void *)(addr + offset);
-	iov_ReadOffset.iov_len = len;*/
+    if (GAME_PID < 0) {
+        GAME_PID = getpid();
+    }
 	return (int) syscall(process_readv_syscall, GAME_PID, & iov_ReadBuffer, 1, & iov_ReadOffset, 1, 0);
 #else
 	if (memcpy(buff, (void *)(addr + offset), len) != nullptr)
@@ -66,11 +62,9 @@ int pw(void * buff, size_t len, long int addr, long int offset) {
     iov_WriteBuffer[0].iov_len = len;
     iov_WriteOffset[0].iov_base = (void *)(addr + offset);
     iov_WriteOffset[0].iov_len = len;
-	/*iovec iov_WriteBuffer {}, iov_WriteOffset {};
-	iov_WriteBuffer.iov_base = buff;
-	iov_WriteBuffer.iov_len = len;
-	iov_WriteOffset.iov_base = (void *)(addr + offset);
-	iov_WriteOffset.iov_len = len;*/
+    if (GAME_PID < 0) {
+        GAME_PID = getpid();
+    }
 	return (int) syscall(process_writev_syscall, GAME_PID, & iov_WriteBuffer, 1, & iov_WriteOffset, 1, 0);
 #else
 	if (memcpy((void *)(addr + offset), buff, len) != nullptr)
@@ -232,10 +226,8 @@ void MOffset(const mbyte * value, long offset, int type, int len) {
 
 void readmaps_all() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -251,10 +243,8 @@ void readmaps_all() {
 
 void readmaps_bad() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -270,10 +260,8 @@ void readmaps_bad() {
 
 void readmaps_c_alloc() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -289,10 +277,8 @@ void readmaps_c_alloc() {
 
 void readmaps_c_bss() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -308,10 +294,8 @@ void readmaps_c_bss() {
 
 void readmaps_c_data() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -328,10 +312,8 @@ void readmaps_c_data() {
 
 void readmaps_c_heap() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -347,10 +329,8 @@ void readmaps_c_heap() {
 
 void readmaps_java_heap() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -366,10 +346,8 @@ void readmaps_java_heap() {
 
 void readmaps_a_anonmyous() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -385,11 +363,8 @@ void readmaps_a_anonmyous() {
 
 void readmaps_code_system() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	int i = 0, flag = 1;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 	}
 	while (!feof(fp)) {
@@ -404,10 +379,8 @@ void readmaps_code_system() {
 
 void readmaps_stack() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -423,10 +396,8 @@ void readmaps_stack() {
 
 void readmaps_ashmem() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -442,10 +413,8 @@ void readmaps_ashmem() {
 
 void readmaps_code_app() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -461,10 +430,8 @@ void readmaps_code_app() {
 
 void readmaps_v_video() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -480,10 +447,8 @@ void readmaps_v_video() {
 
 void readmaps_other() {
 	sAddr pmaps {0, 0};
-	FILE * fp;
-	char lj[64], buff[256];
-	sprintf(lj, "/proc/%d/maps", GAME_PID);
-	fp = fopen(lj, "r");
+	char buff[256];
+	FILE * fp = fopen("/proc/self/maps", "r");
 	if (fp == nullptr) {
 		return;
 	}
@@ -495,11 +460,6 @@ void readmaps_other() {
 		}
 	}
 	fclose(fp);
-}
-
-void MemTool::initMemTool() {
-	GAME_PID = getpid();
-	page_size = sysconf(_SC_PAGESIZE);
 }
 
 void MemTool::SetSearchRange(Range range) {

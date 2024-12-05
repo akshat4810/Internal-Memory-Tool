@@ -33,7 +33,6 @@ enum Range {
 };
 
 namespace MemTool {
-    void initMemTool();
     void SetSearchRange(Range range);
     void MemorySearch(const char* value, Type type);
     void MemoryOffset(const char* value, long int offset, Type type);
